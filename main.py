@@ -1,19 +1,25 @@
-from tkinter import *
+import tkinter as tk
 
 class Application:
-    def __init__(self, master=None):
-        self.widget1 = Frame(master)
-        self.widget1.pack()
-        self.msg = Label(self.widget1, text='50 Minutes')
-        self.msg['font'] = ('Times New Roman', '50')
-        self.msg.pack()
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Pomodoro Timer")
+        self.master.geometry("400x200")
+        
+        self.time_left = 50 * 60
+        self.running = False
 
-        self.start = Button(self.widget1)
-        self.start['text'] = 'Start Timer'
-        self.start['font'] = ('Verdana', '30')
-        self.start['width'] = 10
-        self.start.pack()
+        self.label = tk.Label(master, text=self.format_time(self.time_left), font=("Times New Roman", 50))
+        self.label.pack(pady=20)
 
-root = Tk()
-Application(root)
-root.mainloop()
+
+    def format_time(self, seconds):
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f"{minutes:02}:{seconds:02}"
+        
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = Application(master=root)
+    root.mainloop()
