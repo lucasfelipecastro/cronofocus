@@ -41,17 +41,25 @@ class Application:
         seconds = seconds % 60
         return f"{minutes:02}:{seconds:02}"
     
-    def update_timer(self):
-        if self.running and self.time_left > 0:
-            self.time_left -= 1
-            self.label_50.config(text=self.format_time(self.time_left))
-            self.label_40.config(text=self.format_time(self.time_left))
-            self.master.after(1000, self.update_timer)
-        
-        elif self.time_left == 0:
-            self.running = False
+    def update_timer_50(self):
+        if self.running_50 and self.time_50_left > 0:
+            self.time_50_left -= 1
+            self.label_50.config(text=self.format_time(self.time_50_left))
+            self.label_40.config(text=self.format_time(self.time_50_left))
+            self.master.after(1000, self.update_timer_50)
+        elif self.time_50_left == 0:
+            self.running_50 = False
             self.label_50.config(text="Time's up!")
 
+    def update_timer_40(self):
+        if self.running_40 and self.time_40_left > 0:
+            self.time_40_left -= 1
+            self.label_40.config(text=self.format_time(self.time_40_left))
+            self.master.after(1000, self.update_timer_40)
+        elif self.time_40_left == 0:
+            self.running_40 = False
+            self.label_40.config(text="Time's up!")
+            
     def start_timer(self):
         if not self.running:
             self.running = True
