@@ -3,18 +3,25 @@ import tkinter as tk
 class Application:
     def __init__(self, master):
         self.master = master
-        self.master.title("Pomodoro Timer")
+        self.master.title("Cronofocus")
         self.master.geometry("400x200")
         
-        self.time_left = 50 * 60
+        # Time left in seconds
+        self.time_left = 3
         self.running = False
 
-        self.label = tk.Label(master, text=self.format_time(self.time_left), font=("Times New Roman", 50))
-        self.label.pack(pady=20)
-
-        self.start_button = tk.Button(master, text="Start Timer", font=("Times New Roman", 24), command=self.start_timer)   
-        self.start_button.pack()
-
+        # Create the main frame
+        self.frame = tk.Frame(master)
+        self.frame.pack(pady=20, padx=20, fill='both', expand=True)
+        
+        # Create a label (timeline)
+        self.label = tk.Label(self.frame, text=self.format_time(self.time_left), font=("Times New Roman", 48))
+        self.label.pack(side="left", fill="both", expand=True)
+        
+        # Create a start button
+        self.start_button = tk.Button(self.frame, text="Start Timer", font=("Times New Roman", 24), command=self.start_timer)
+        self.start_button.pack(side="right", fill="both", expand=True)
+        
     def format_time(self, seconds):
         minutes = seconds // 60
         seconds = seconds % 60
