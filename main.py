@@ -7,21 +7,35 @@ class Application:
         self.master.geometry("400x200")
         
         # Time left in seconds
-        self.time_left = 3
-        self.running = False
+        self.time_50_left = 3 # Modify this value to change the time
+        self.time_40_left = 2 # Modify this value to change the time
+        self.running_50 = False
+        self.running_40 = False
+        
+        # Main frame
+        self.main_frame = tk.Frame(master)
+        self.main_frame.pack(pady=20, padx=20, fill='both', expand=True)
+        
+        # Timer 50 minutes frame
+        self.timer_50_frame = tk.Frame(self.main_frame)
+        self.timer_50_frame.pack(pady=20, padx=20, fill='both', expand=True)
 
-        # Create the main frame
-        self.frame = tk.Frame(master)
-        self.frame.pack(pady=20, padx=20, fill='both', expand=True)
+        self.label_50 = tk.Label(self.timer_50_frame, text=self.format_time(self.time_50_left), font=("Times New Roman", 25))
+        self.label_50.pack(side="left", fill='both', expand=True)
+
+        self.start_button_50 = tk.Button(self.timer_50_frame, text="Start 50 min", font=("Times New Roman", 10), command=self.start_timer_50)
+        self.start_button_50.pack(side="left", fill='x', padx=3, pady=1, expand=True)
         
-        # Create a label (timeline)
-        self.label = tk.Label(self.frame, text=self.format_time(self.time_left), font=("Times New Roman", 48))
-        self.label.pack(side="left", fill="both", expand=True)
-        
-        # Create a start button
-        self.start_button = tk.Button(self.frame, text="Start Timer", font=("Times New Roman", 24), command=self.start_timer)
-        self.start_button.pack(side="right", fill="both", expand=True)
-        
+        # Timer 40 minutes frame
+        self.timer_40_frame = tk.Frame(self.main_frame)
+        self.timer_40_frame.pack(side="top", fill="both", expand=True)
+
+        self.label_40 = tk.Label(self.timer_40_frame, text=self.format_time(self.time_40_left), font=("Times New Roman", 25))
+        self.label_40.pack(side="left", fill="both", expand=True)
+
+        self.start_button_40 = tk.Button(self.timer_40_frame, text="Start 40 min", font=("Times New Roman", 10), command=self.start_timer_40)
+        self.start_button_40.pack(side="left", fill="x", padx=3, pady=1, expand=True)
+    
     def format_time(self, seconds):
         minutes = seconds // 60
         seconds = seconds % 60
@@ -30,12 +44,13 @@ class Application:
     def update_timer(self):
         if self.running and self.time_left > 0:
             self.time_left -= 1
-            self.label.config(text=self.format_time(self.time_left))
+            self.label_50.config(text=self.format_time(self.time_left))
+            self.label_40.config(text=self.format_time(self.time_left))
             self.master.after(1000, self.update_timer)
         
         elif self.time_left == 0:
             self.running = False
-            self.label.config(text="Time's up!")
+            self.label_50.config(text="Time's up!")
 
     def start_timer(self):
         if not self.running:
