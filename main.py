@@ -60,10 +60,15 @@ class Application:
             self.running_40 = False
             self.label_40.config(text="Time's up!")
             
-    def start_timer(self):
-        if not self.running:
-            self.running = True
-            self.update_timer()
+    def start_timer_50(self):
+        if not self.running_50:
+            self.running_50 = True
+            self.update_timer_50()
+
+    def start_timer_40(self):
+        if not self.running_40:
+            self.running_40 = True
+            self.update_timer_40()
 
 if __name__ == "__main__":
     root = tk.Tk()
