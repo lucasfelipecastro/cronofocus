@@ -7,9 +7,10 @@ class Application:
         self.master.geometry("400x200")
         
         # Time left in seconds
-        self.time_50_left = 3 # Modify this value to change the time
-        self.time_40_left = 2 # Modify this value to change the time
-        self.time_30_left = 1 # Modify this value to change the time
+        self.time_50_left = 4 # Modify this value to change the time
+        self.time_40_left = 3 # Modify this value to change the time
+        self.time_30_left = 2 # Modify this value to change the time
+        self.time_25_left = 1 # Modify this value to change the time
         self.running_50 = False
         self.running_40 = False
         self.running_30 = False
@@ -47,7 +48,17 @@ class Application:
 
         self.start_button_30 = tk.Button(self.timer_30_frame, text="Start 30 min", font=("Times New Roman", 10), command=self.start_timer_30)
         self.start_button_30.pack(side="left", fill="x", padx=3, pady=1, expand=True)
-    
+
+        # Timer 25 minutes frame    
+        self.timer_25_frame = tk.Frame(self.main_frame)
+        self.timer_25_frame.pack(pady=20, padx=20, side="top", fill="both", expand=True)
+
+        self.label_25 = tk.Label(self.timer_25_frame, text=self.format_time(self.time_25_left), font=("Times New Roman", 25))
+        self.label_25.pack(side="left", fill="both", expand=True)
+
+        self.start_button_25 = tk.Button(self.timer_25_frame, text="Start 25 min", font=("Times New Roman", 10), command=self.start_timer_25)
+        self.start_button_25.pack(side="left", fill="x", padx=3, pady=1, expand=True)
+
     def format_time(self, seconds):
         minutes = seconds // 60
         seconds = seconds % 60
