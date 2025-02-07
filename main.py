@@ -1,5 +1,6 @@
 import tkinter as tk
 import winsound
+import threading
 
 class Application:
     def __init__(self, master):
@@ -17,6 +18,9 @@ class Application:
         self.running_30 = False
         self.running_25 = False
         
+        # Sound instance
+        self.sound_instance = Sound()
+
         # Main frame
         self.main_frame = tk.Frame(master)
         self.main_frame.pack(pady=20, padx=20, fill='none', expand=True)
@@ -75,7 +79,7 @@ class Application:
         elif self.time_50_left == 0:
             self.running_50 = False
             self.label_50.config(text="Time's up!")
-            self.play_sound()
+            self.sound_instance.play_sound()  # Stop or play sound when time is up
 
     def update_timer_40(self):
         if self.running_40 and self.time_40_left > 0:
@@ -85,7 +89,7 @@ class Application:
         elif self.time_40_left == 0:
             self.running_40 = False
             self.label_40.config(text="Time's up!")
-            self.play_sound()
+            self.sound_instance.play_sound()  # Stop or play sound when time is up
 
     def update_timer_30(self):
         if self.running_30 and self.time_30_left > 0:
@@ -95,7 +99,7 @@ class Application:
         elif self.time_30_left == 0:
             self.running_30 = False
             self.label_30.config(text="Time's up!")
-            self.play_sound()
+            self.sound_instance.play_sound()  # Stop or play sound when time is up
 
     def update_timer_25(self):
         if self.running_25 and self.time_25_left > 0:
@@ -105,7 +109,7 @@ class Application:
         elif self.time_25_left == 0:
             self.running_25 = False
             self.label_25.config(text="Time's up!")
-            self.play_sound()
+            self.sound_instance.play_sound()  # Stop or play sound when time is up
 
     def start_timer_50(self):
         if not self.running_50:
@@ -126,9 +130,31 @@ class Application:
         if not self.running_25:
             self.running_25 = True
             self.update_timer_25()
-    
+            self.sound_instance.play_sound()  # Start playing sound when timer starts
+
+
+class Sound:
+    def __init__(self):
+        self.sound_playing = False
+        self.sound_thread = None
+
     def play_sound(self):
-        winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+        if self.sound_playing:
+            # Se o som está tocando, interrompe-o
+            self.sound_playing = False
+            if self.sound_thread is not None:
+                self.sound_thread.join()  # Espera o thread terminar
+                self.sound_thread = None
+        else:
+            # Se o som não está tocando, toca o som
+            self.sound_playing = True
+            self.sound_thread = threading.Thread(target=self._play_continuous_sound)
+            self.sound_thread.start()
+    
+    def _play_continuous_sound(self):
+        while self.sound_playing:
+            winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+
 
 if __name__ == '__main__':
     root = tk.Tk()
