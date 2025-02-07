@@ -1,4 +1,5 @@
 import tkinter as tk
+import winsound
 
 class Application:
     def __init__(self, master):
@@ -74,6 +75,7 @@ class Application:
         elif self.time_50_left == 0:
             self.running_50 = False
             self.label_50.config(text="Time's up!")
+            self.play_sound()
 
     def update_timer_40(self):
         if self.running_40 and self.time_40_left > 0:
@@ -83,6 +85,7 @@ class Application:
         elif self.time_40_left == 0:
             self.running_40 = False
             self.label_40.config(text="Time's up!")
+            self.play_sound()
 
     def update_timer_30(self):
         if self.running_30 and self.time_30_left > 0:
@@ -92,6 +95,7 @@ class Application:
         elif self.time_30_left == 0:
             self.running_30 = False
             self.label_30.config(text="Time's up!")
+            self.play_sound()
 
     def update_timer_25(self):
         if self.running_25 and self.time_25_left > 0:
@@ -101,6 +105,7 @@ class Application:
         elif self.time_25_left == 0:
             self.running_25 = False
             self.label_25.config(text="Time's up!")
+            self.play_sound()
 
     def start_timer_50(self):
         if not self.running_50:
@@ -121,6 +126,9 @@ class Application:
         if not self.running_25:
             self.running_25 = True
             self.update_timer_25()
+    
+    def play_sound(self):
+        winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
 
 if __name__ == '__main__':
     root = tk.Tk()
