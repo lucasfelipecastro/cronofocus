@@ -82,6 +82,15 @@ class Application:
         elif self.time_40_left == 0:
             self.running_40 = False
             self.label_40.config(text="Time's up!")
+
+    def update_timer_30(self):
+        if self.running_30 and self.time_30_left > 0:
+            self.time_30_left -= 1
+            self.label_30.config(text=self.format_time(self.time_30_left))
+            self.master.after(1000, self.update_timer_30)
+        elif self.time_30_left == 0:
+            self.running_30 = False
+            self.label_30.config(text="Time's up!")
             
     def start_timer_50(self):
         if not self.running_50:
