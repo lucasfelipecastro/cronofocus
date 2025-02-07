@@ -111,6 +111,11 @@ class Application:
             self.running_40 = True
             self.update_timer_40()
 
+    def start_timer_30(self):
+        if not self.running_30:
+            self.running_30 = True
+            self.update_timer_30()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = Application(master=root)
