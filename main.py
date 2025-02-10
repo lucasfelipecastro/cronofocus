@@ -2,7 +2,7 @@ import tkinter as tk
 import winsound
 import threading
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 import time
 
 # Function to log progress
@@ -11,15 +11,19 @@ def save_progress(session_name, duration, completed_sessions):
     row = [timestamp, session_name, duration, completed_sessions]
     worksheet.append_row(row)
 
-# Define the scope and obtain credentials
+# Define the scope
 scope = [
-    "https://www.googleapis.com/auth/spreadsheets", 
+    "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
 
-creds = ServiceAccountCredentials.from_json_keyfile_name("C:/techWin11/pythonProjects/cronofocus/gen-lang-client-0841060528-1f4635a8f204.json", scope)
+# Authenticate using the service account credentials
+creds = Credentials.from_service_account_file(
+    "C:/techWin11/pythonProjects/cronofocus/gen-lang-client-0841060528-1f4635a8f204.json",
+    scopes=scope
+)
 
-# Authenticate the client
+# Authenticate the client with the credentials
 client = gspread.authorize(creds)
 
 # Open the spreadsheet using the ID
