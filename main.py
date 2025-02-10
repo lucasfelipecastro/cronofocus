@@ -46,10 +46,14 @@ class Application:
         break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-        # Entry to modify break time
-        self.break_time_entry = tk.Entry(break_frame, font=('Times New Roman', 10), width=5)
-        self.break_time_entry.insert(0, str(self.time_left['break']))  # Show current break time
-        self.break_time_entry.pack(side='left', padx=3, pady=1)
+        # Entry to modify break time (minutes and seconds)
+        self.break_minutes_entry = tk.Entry(break_frame, font=('Times New Roman', 10), width=5)
+        self.break_minutes_entry.insert(0, str(self.time_left['break'] // 60))  # Show current minutes
+        self.break_minutes_entry.pack(side='left', padx=3, pady=1)
+
+        self.break_seconds_entry = tk.Entry(break_frame, font=('Times New Roman', 10), width=5)
+        self.break_seconds_entry.insert(0, str(self.time_left['break'] % 60))  # Show current seconds
+        self.break_seconds_entry.pack(side='left', padx=3, pady=1)
 
         # Button to update break time
         self.update_break_time_button = tk.Button(break_frame, text='Update Break Time', font=('Times New Roman', 10), command=self.update_break_time)
@@ -81,14 +85,18 @@ class Application:
     
     def update_break_time(self):
         try:
-            new_break_time = int(self.break_time_entry.get()) * 60  # Convert minutes to seconds
-            if new_break_time > 0:
-                self.time_left['break'] = new_break_time
+            minutes = int(self.break_minutes_entry.get())
+            seconds = int(self.break_seconds_entry.get())
+            
+            # Validate input to ensure it's positive and the time is above 0
+            if minutes >= 0 and seconds >= 0 and (minutes > 0 or seconds > 0):
+                total_seconds = minutes * 60 + seconds
+                self.time_left['break'] = total_seconds
                 self.labels['break'].config(text=self.format_time(self.time_left['break']))
             else:
-                print("Please enter a valid time.")
+                print("Please enter a valid time (must be greater than 0).")
         except ValueError:
-            print("Invalid input. Please enter an integer.")
+            print("Invalid input. Please enter valid integers.")
 
 class Sound:
     def __init__(self):
