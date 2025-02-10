@@ -45,11 +45,20 @@ class Application:
 
         break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+
+        # Entry to modify break time
+        self.break_time_entry = tk.Entry(break_frame, font=('Times New Roman', 10), width=5)
+        self.break_time_entry.insert(0, str(self.time_left['break']))  # Show current break time
+        self.break_time_entry.pack(side='left', padx=3, pady=1)
+
+        # Button to update break time
+        self.update_break_time_button = tk.Button(break_frame, text='Update Break Time', font=('Times New Roman', 10), command=self.update_break_time)
+        self.update_break_time_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
         
         # Stop Sound button
         self.stop_sound_button = tk.Button(self.main_frame, text='Stop Sound', font=('Times New Roman', 10), command=self.sound_instance.stop_sound)
         self.stop_sound_button.pack(pady=5)
-    
+
     def format_time(self, seconds):
         minutes = seconds // 60
         seconds = seconds % 60
@@ -69,6 +78,17 @@ class Application:
         if not self.running[timer_name]:
             self.running[timer_name] = True
             self.update_timer(timer_name)
+    
+    def update_break_time(self):
+        try:
+            new_break_time = int(self.break_time_entry.get()) * 60  # Convert minutes to seconds
+            if new_break_time > 0:
+                self.time_left['break'] = new_break_time
+                self.labels['break'].config(text=self.format_time(self.time_left['break']))
+            else:
+                print("Please enter a valid time.")
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
 
 class Sound:
     def __init__(self):
