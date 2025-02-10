@@ -6,11 +6,11 @@ class Application:
     def __init__(self, master):
         self.master = master
         self.master.title('Cronofocus')
-        self.master.geometry('400x250')
+        self.master.geometry('400x300')
         
         # Time left in seconds
-        self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1}  # Modify values to change the time
-        self.running = {'50': False, '40': False, '30': False, '25': False}
+        self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Modify values to change the time
+        self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
         
         # Sound instance
         self.sound_instance = Sound()
@@ -35,6 +35,16 @@ class Application:
 
             start_button = tk.Button(frame, text=f'Start {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.start_timer(m))
             start_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+        
+        # Break timer
+        break_frame = tk.Frame(self.timers_frame)
+        break_frame.pack(pady=5, padx=20, fill='both', expand=True)
+        
+        self.labels['break'] = tk.Label(break_frame, text=self.format_time(self.time_left['break']), font=('Times New Roman', 20))
+        self.labels['break'].pack(side='left', fill='both', expand=True)
+
+        break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), command=lambda: self.start_timer('break'))
+        break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
         
         # Stop Sound button
         self.stop_sound_button = tk.Button(self.main_frame, text='Stop Sound', font=('Times New Roman', 10), command=self.sound_instance.stop_sound)
