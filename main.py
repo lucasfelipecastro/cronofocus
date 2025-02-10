@@ -6,14 +6,15 @@ class Application:
     def __init__(self, master):
         self.master = master
         self.master.title('Cronofocus')
-        self.master.geometry('500x300')
+        self.master.geometry('500x400')
         self.master.resizable(False, False)
         
         # Time left in seconds
         self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Modify values to change the time
         self.original_time = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Store original time to reset
         self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
-        
+        self.completed_sessions = 0  # Tracks the number of completed sessions
+
         # Sound instance
         self.sound_instance = Sound()
 
@@ -66,10 +67,14 @@ class Application:
         # Button to update break time
         self.update_break_time_button = tk.Button(break_frame, text='Update Break Time', font=('Times New Roman', 10), command=self.update_break_time)
         self.update_break_time_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
-        
+
         # Stop Sound button
         self.stop_sound_button = tk.Button(self.main_frame, text='Stop Sound', font=('Times New Roman', 10), command=self.sound_instance.stop_sound)
         self.stop_sound_button.pack(pady=5)
+
+        # Progress label
+        self.progress_label = tk.Label(self.main_frame, text=f'Completed Sessions: {self.completed_sessions}/9', font=('Times New Roman', 14))
+        self.progress_label.pack(pady=10)
 
     def format_time(self, seconds):
         minutes = seconds // 60
@@ -85,6 +90,13 @@ class Application:
             self.running[timer_name] = False
             self.labels[timer_name].config(text="Time's up!")
             self.sound_instance.play_sound()
+            self.complete_session()
+
+    def complete_session(self):
+        # Increase the completed session count
+        self.completed_sessions += 1
+        # Update progress label
+        self.progress_label.config(text=f'Completed Sessions: {self.completed_sessions}/9')
 
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
