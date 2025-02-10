@@ -1,14 +1,14 @@
 import tkinter as tk
 import winsound
 import threading
-import gspread
+from gspread.client import Client
 from google.oauth2.service_account import Credentials
 import time
 
 # Function to log progress
-def save_progress(session_name, duration, completed_sessions):
+def save_progress(session_name, completed_sessions):
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-    row = [timestamp, session_name, duration, completed_sessions]
+    row = [timestamp, session_name, completed_sessions]  # Storing only the three columns
     worksheet.append_row(row)
 
 # Define the scope
@@ -24,15 +24,19 @@ creds = Credentials.from_service_account_file(
 )
 
 # Authenticate the client with the credentials
-client = gspread.authorize(creds)
+client = Client(auth=creds)
 
 # Open the spreadsheet using the ID
 spreadsheet = client.open_by_key('1K9-zcnVTqY_Ug975Yx_bWMxftAB6_kvB_VGkiIr0xQA')  # Replace with your ID
 
-# From here, you can continue with your code as before
-worksheet = spreadsheet.sheet1  # Or the name of your sheet if needed
-data = worksheet.get_all_records()
-print(data)
+# Headers
+headers = ["Date", "Time", "Check-In"]  # Only these three columns are considered
+worksheet = spreadsheet.sheet1
+
+# Fetch and filter the data to include only the relevant columns
+data = worksheet.get_all_records(head=1)
+filtered_data = [{k: v for k, v in record.items() if k in headers} for record in data]
+print(filtered_data)
 
 class Application:
     def __init__(self, master):
@@ -42,8 +46,8 @@ class Application:
         self.master.resizable(False, False)
         
         # Time left in seconds
-        self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Modify values to change the time
-        self.original_time = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Store original time to reset
+        self.time_left = {'50': 5, '40': 4, '30': 3, '25': 2, 'break': 300}  # Adjusted seconds
+        self.original_time = {'50': 3000, '40': 2400, '30': 1800, '25': 1500, 'break': 300}  # Store original time to reset
         self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
         self.completed_sessions = 0  # Tracks the number of completed sessions
 
@@ -87,6 +91,10 @@ class Application:
         break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
+        # Pause button for Break Timer
+        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Times New Roman', 10), command=self.pause_timer_break)
+        self.pause_break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+
         # Entry to modify break time (minutes and seconds)
         self.break_minutes_entry = tk.Entry(break_frame, font=('Times New Roman', 10), width=5)
         self.break_minutes_entry.insert(0, str(self.time_left['break'] // 60))  # Show current minutes
@@ -128,10 +136,10 @@ class Application:
         # Increase the completed session count
         self.completed_sessions += 1
         # Update progress label
-        self.progress_label.config(text=f'Completed Sessions: {self.completed_sessions}/9')
+        self.progress_label.config(text=f'Completed Sessions: {self.completed_sessions}')
         
         # Save the session progress to Google Sheets
-        save_progress('Session', '50:00', self.completed_sessions)  # Adjust session name and duration if necessary
+        save_progress('Session', self.completed_sessions)  # Adjust session name and completed sessions if necessary
 
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
@@ -141,7 +149,11 @@ class Application:
     def pause_timer(self, timer_name):
         self.running[timer_name] = False
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
-    
+
+    def pause_timer_break(self):
+        self.running['break'] = False
+        self.labels['break'].config(text=self.format_time(self.time_left['break']))
+
     def reset_timer(self, timer_name):
         self.running[timer_name] = False
         self.time_left[timer_name] = self.original_time[timer_name]  # Reset to original time
