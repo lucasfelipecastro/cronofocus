@@ -6,7 +6,8 @@ class Application:
     def __init__(self, master):
         self.master = master
         self.master.title('Cronofocus')
-        self.master.geometry('400x300')
+        self.master.geometry('500x300')
+        self.master.resizable(False, False)
         
         # Time left in seconds
         self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Modify values to change the time
