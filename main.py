@@ -10,6 +10,7 @@ class Application:
         
         # Time left in seconds
         self.time_left = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Modify values to change the time
+        self.original_time = {'50': 4, '40': 3, '30': 2, '25': 1, 'break': 5}  # Store original time to reset
         self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
         
         # Sound instance
@@ -38,6 +39,9 @@ class Application:
             
             pause_button = tk.Button(frame, text=f'Pause {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.pause_timer(m))
             pause_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+            
+            reset_button = tk.Button(frame, text=f'Reset {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.reset_timer(m))
+            reset_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
         # Break timer
         break_frame = tk.Frame(self.timers_frame)
@@ -88,6 +92,11 @@ class Application:
     
     def pause_timer(self, timer_name):
         self.running[timer_name] = False
+        self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
+    
+    def reset_timer(self, timer_name):
+        self.running[timer_name] = False
+        self.time_left[timer_name] = self.original_time[timer_name]  # Reset to original time
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
 
     def update_break_time(self):
