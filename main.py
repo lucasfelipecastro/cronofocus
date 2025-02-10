@@ -35,7 +35,10 @@ class Application:
 
             start_button = tk.Button(frame, text=f'Start {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.start_timer(m))
             start_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
-        
+            
+            pause_button = tk.Button(frame, text=f'Pause {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.pause_timer(m))
+            pause_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+
         # Break timer
         break_frame = tk.Frame(self.timers_frame)
         break_frame.pack(pady=5, padx=20, fill='both', expand=True)
@@ -83,6 +86,10 @@ class Application:
             self.running[timer_name] = True
             self.update_timer(timer_name)
     
+    def pause_timer(self, timer_name):
+        self.running[timer_name] = False
+        self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
+
     def update_break_time(self):
         try:
             minutes = int(self.break_minutes_entry.get())
