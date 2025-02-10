@@ -1,6 +1,34 @@
 import tkinter as tk
 import winsound
 import threading
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import time
+
+# Function to log progress
+def save_progress(session_name, duration, completed_sessions):
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    row = [timestamp, session_name, duration, completed_sessions]
+    worksheet.append_row(row)
+
+# Define the scope and obtain credentials
+scope = [
+    "https://www.googleapis.com/auth/spreadsheets", 
+    "https://www.googleapis.com/auth/drive"
+]
+
+creds = ServiceAccountCredentials.from_json_keyfile_name("C:/techWin11/pythonProjects/cronofocus/gen-lang-client-0841060528-1f4635a8f204.json", scope)
+
+# Authenticate the client
+client = gspread.authorize(creds)
+
+# Open the spreadsheet using the ID
+spreadsheet = client.open_by_key('1K9-zcnVTqY_Ug975Yx_bWMxftAB6_kvB_VGkiIr0xQA')  # Replace with your ID
+
+# From here, you can continue with your code as before
+worksheet = spreadsheet.sheet1  # Or the name of your sheet if needed
+data = worksheet.get_all_records()
+print(data)
 
 class Application:
     def __init__(self, master):
@@ -97,6 +125,9 @@ class Application:
         self.completed_sessions += 1
         # Update progress label
         self.progress_label.config(text=f'Completed Sessions: {self.completed_sessions}/9')
+        
+        # Save the session progress to Google Sheets
+        save_progress('Session', '50:00', self.completed_sessions)  # Adjust session name and duration if necessary
 
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
