@@ -87,7 +87,7 @@ class Application:
         break_button = tk.Button(break_frame, text='Start Break', font=('Arial', 11), bd=1, command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Arial', 11), bd=1, command=self.pause_break_timer)
+        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Arial', 11), bd=1, command=self.toggle_break_timer)
         self.pause_break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
         self.change_break_label = tk.Label(self.main_frame, text='Set Break Time (in minutes):', font=('Arial', 12, 'bold'))
@@ -138,6 +138,12 @@ class Application:
         self.running[timer_name] = False
         self.time_left[timer_name] = self.original_time[timer_name]  # Reset to original time
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
+
+    def toggle_break_timer(self):
+        if self.running['break']:
+            self.pause_break_timer()
+        else:
+            self.start_timer('break')
 
     def pause_break_timer(self):
         self.running['break'] = False
