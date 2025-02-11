@@ -32,7 +32,7 @@ spreadsheet = client.open_by_key('1K9-zcnVTqY_Ug975Yx_bWMxftAB6_kvB_VGkiIr0xQA')
 
 # Headers for the Google Sheets columns
 headers = ['Date', 'Time', 'Check-In']
-worksheet = spreadsheet.sheet1
+worksheet = spreadsheet.get_worksheet(0)
 
 class Application:
     def __init__(self, master):
@@ -99,6 +99,10 @@ class Application:
         self.set_break_button = tk.Button(self.main_frame, text='Set Break Time', font=('Arial', 11), command=self.set_break_time)
         self.set_break_button.pack(pady=5)
 
+        # Feedback label for break time adjustment
+        self.break_time_feedback = tk.Label(self.main_frame, text='', font=('Arial', 12, 'italic'), fg='green')
+        self.break_time_feedback.pack(pady=5)
+
         # Stop Sound button
         self.stop_sound_button = tk.Button(self.main_frame, text=' ⃠   Stop Sound', font=('Arial', 11), command=self.sound_instance.stop_sound, width=15, height=2)
         self.stop_sound_button.pack(pady=5)
@@ -110,15 +114,16 @@ class Application:
         return f'{minutes:02}:{seconds:02}'
     
     def update_timer(self, timer_name):
-        if self.running[timer_name] and self.time_left[timer_name] > 0:
-            self.time_left[timer_name] -= 1
-            self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
-            self.master.after(1000, lambda: self.update_timer(timer_name))
-        elif self.time_left[timer_name] == 0:
-            self.running[timer_name] = False
-            self.labels[timer_name].config(text="Time's up!")
-            self.sound_instance.play_sound()
-            self.complete_session(timer_name)
+        if self.running[timer_name]:
+            if self.time_left[timer_name] > 0:
+                self.time_left[timer_name] -= 1
+                self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
+                self.master.after(1000, lambda: self.update_timer(timer_name))  # Continue updating
+            elif self.time_left[timer_name] == 0:
+                self.running[timer_name] = False
+                self.labels[timer_name].config(text="Time's up!")
+                self.sound_instance.play_sound()
+                self.complete_session(timer_name)
 
     def complete_session(self, session_name):
         # Save the session progress to Google Sheets
@@ -156,8 +161,11 @@ class Application:
                 self.time_left['break'] = break_minutes * 60  # Convert minutes to seconds
                 self.original_time['break'] = self.time_left['break']  # Update original time
                 self.labels['break'].config(text=self.format_time(self.time_left['break']))
+                self.break_time_feedback.config(text=f'Break time set to {break_minutes} minutes!', fg='green')  # Show success message
+            else:
+                self.break_time_feedback.config(text='Please enter a positive number!', fg='red')  # Show error message
         except ValueError:
-            print('Invalid input for break time!')
+            self.break_time_feedback.config(text='Invalid input! Please enter a number.', fg='red')  # Show error message
 
 class Sound:
     def __init__(self):
