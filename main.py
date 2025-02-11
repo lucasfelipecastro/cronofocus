@@ -38,7 +38,7 @@ class Application:
     def __init__(self, master):
         self.master = master
         self.master.title('Cronofocus')
-        self.master.geometry('550x500')
+        self.master.geometry('550x550')
         self.master.resizable(False, False)
 
         # Time left in seconds for Pomodoro sessions
@@ -107,12 +107,13 @@ class Application:
         self.stop_sound_button = tk.Button(self.main_frame, text=' ⃠   Stop Sound', font=('Arial', 11), command=self.sound_instance.stop_sound, width=15, height=2)
         self.stop_sound_button.pack(pady=5)
 
-
+    # Function to format time in mm:ss format
     def format_time(self, seconds):
         minutes = seconds // 60
         seconds = seconds % 60
         return f'{minutes:02}:{seconds:02}'
     
+    # Function to update the timer every second
     def update_timer(self, timer_name):
         if self.running[timer_name]:
             if self.time_left[timer_name] > 0:
@@ -125,53 +126,51 @@ class Application:
                 self.sound_instance.play_sound()
                 self.complete_session(timer_name)
 
+    # Function to complete session and log progress to Google Sheets
     def complete_session(self, session_name):
         # Save the session progress to Google Sheets
         if session_name in ['50', '40', '30', '25']:
             save_progress(session_name, self.original_time[session_name] // 60)  # Save the session time in minutes
 
+    # Function to start the timer
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
             # If the timer was paused, it should resume from the remaining time
             self.running[timer_name] = True
             self.update_timer(timer_name)
 
-            # Change the "Resume" button text back to "Pause"
-            for frame in self.timers_frame.winfo_children():
-                if isinstance(frame, tk.Frame):
-                    for widget in frame.winfo_children():
-                        if isinstance(widget, tk.Button) and widget.cget('text').startswith(f'▶ Resume {timer_name}'):
-                            widget.config(text=f"|| Pause {timer_name} min")
-
+    # Function to pause the timer
     def pause_timer(self, timer_name):
         # Pause the timer and stop updating it
         self.running[timer_name] = False
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
 
-        # Change the "Pause" button to "Resume"
-        for frame in self.timers_frame.winfo_children():
-            if isinstance(frame, tk.Frame):
-                for widget in frame.winfo_children():
-                    if isinstance(widget, tk.Button) and widget.cget('text').startswith(f'|| Pause {timer_name}'):
-                        widget.config(text=f"▶ Resume {timer_name} min")
 
-
-
+    # Function to reset the timer to the original time
     def reset_timer(self, timer_name):
         self.running[timer_name] = False
         self.time_left[timer_name] = self.original_time[timer_name]  # Reset to original time
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
 
+    # Function to toggle break timer between start and pause
     def toggle_break_timer(self):
         if self.running['break']:
             self.pause_break_timer()
         else:
             self.start_timer('break')
 
+    # Function to pause the break timer
     def pause_break_timer(self):
         self.running['break'] = False
         self.labels['break'].config(text=self.format_time(self.time_left['break']))
+        self.show_break_ended_message()  # Show the break ended message
 
+    # Function to show break ended message
+    def show_break_ended_message(self):
+        break_ended_label = tk.Label(self.main_frame, text='Break ended! Please resume your work.', font=('Arial', 12, 'italic'), fg='red')
+        break_ended_label.pack(pady=5)
+
+    # Function to set custom break time
     def set_break_time(self):
         try:
             break_minutes = int(self.break_time_entry.get())
@@ -189,14 +188,17 @@ class Sound:
     def __init__(self):
         self.sound_playing = False
 
+    # Function to play sound when the timer ends
     def play_sound(self):
         if not self.sound_playing:
             self.sound_playing = True
             threading.Thread(target=self._play_continuous_sound, daemon=True).start()
 
+    # Function to stop the sound
     def stop_sound(self):
         self.sound_playing = False
 
+    # Function to play sound continuously
     def _play_continuous_sound(self):
         while self.sound_playing:
             winsound.PlaySound('SystemExclamation', winsound.SND_ALIAS)
