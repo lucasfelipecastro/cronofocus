@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox  # Import messagebox for pop-ups
 import winsound
 import threading
 from gspread.client import Client
@@ -112,7 +113,7 @@ class Application:
         minutes = seconds // 60
         seconds = seconds % 60
         return f'{minutes:02}:{seconds:02}'
-    
+
     # Function to update the timer every second
     def update_timer(self, timer_name):
         if self.running[timer_name]:
@@ -125,12 +126,17 @@ class Application:
                 self.labels[timer_name].config(text="Time's up!")
                 self.sound_instance.play_sound()
                 self.complete_session(timer_name)
+                # Show pop-up message when timer ends
+                if timer_name in ['50', '40', '30', '25']:
+                    messagebox.showinfo('Timer Finished', f'{timer_name} minute timer has finished!')
+                elif timer_name == 'break':
+                    messagebox.showinfo('Break Finished', 'Break timer has finished!')
 
     # Function to complete session and log progress to Google Sheets
     def complete_session(self, session_name):
         # Save the session progress to Google Sheets
         if session_name in ['50', '40', '30', '25']:
-            save_progress(session_name, self.original_time[session_name] // 60)  # Save the session time in minutes
+            save_progress(session_name, self.original_time[session_name] // 60)
 
     # Function to start the timer
     def start_timer(self, timer_name):
@@ -145,11 +151,10 @@ class Application:
         self.running[timer_name] = False
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
 
-
     # Function to reset the timer to the original time
     def reset_timer(self, timer_name):
         self.running[timer_name] = False
-        self.time_left[timer_name] = self.original_time[timer_name]  # Reset to original time
+        self.time_left[timer_name] = self.original_time[timer_name]
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
 
     # Function to toggle break timer between start and pause
@@ -163,26 +168,20 @@ class Application:
     def pause_break_timer(self):
         self.running['break'] = False
         self.labels['break'].config(text=self.format_time(self.time_left['break']))
-        self.show_break_ended_message()  # Show the break ended message
-
-    # Function to show break ended message
-    def show_break_ended_message(self):
-        break_ended_label = tk.Label(self.main_frame, text='Break ended! Please resume your work.', font=('Arial', 12, 'italic'), fg='red')
-        break_ended_label.pack(pady=5)
 
     # Function to set custom break time
     def set_break_time(self):
         try:
             break_minutes = int(self.break_time_entry.get())
             if break_minutes > 0:
-                self.time_left['break'] = break_minutes * 60  # Convert minutes to seconds
-                self.original_time['break'] = self.time_left['break']  # Update original time
+                self.time_left['break'] = break_minutes * 60
+                self.original_time['break'] = self.time_left['break']
                 self.labels['break'].config(text=self.format_time(self.time_left['break']))
-                self.break_time_feedback.config(text=f'Break time set to {break_minutes} minutes!', fg='green')  # Show success message
+                self.break_time_feedback.config(text=f'Break time set to {break_minutes} minutes!', fg='green')
             else:
-                self.break_time_feedback.config(text='Please enter a positive number!', fg='red')  # Show error message
+                self.break_time_feedback.config(text='Please enter a positive number!', fg='red')
         except ValueError:
-            self.break_time_feedback.config(text='Invalid input! Please enter a number.', fg='red')  # Show error message
+            self.break_time_feedback.config(text='Invalid input! Please enter a number.', fg='red')
 
 class Sound:
     def __init__(self):
