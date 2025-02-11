@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import winsound
 import threading
 from gspread.client import Client
@@ -41,8 +42,8 @@ class Application:
         self.master.resizable(False, False)
 
         # Time left in seconds for Pomodoro sessions
-        self.time_left = {'50': 5, '40': 4, '30': 3, '25': 2, 'break': 300}  # Adjusted seconds
-        self.original_time = {'50': 3000, '40': 2400, '30': 1800, '25': 1500, 'break': 300}  # Store original time to reset
+        self.time_left = {'50': 3000, '40': 2400, '30': 1800, '25': 1500, 'break': 300}  # Adjusted seconds
+        self.original_time = {'50': 5, '40': 4, '30': 3, '25': 2, 'break': 300}  # Store original time to reset
         self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
 
         # Sound instance for alert
@@ -67,14 +68,21 @@ class Application:
             self.labels[minutes] = tk.Label(frame, text=self.format_time(self.time_left[minutes]), font=('Times New Roman', 20))
             self.labels[minutes].pack(side='left', fill='both', expand=True)
 
-            start_button = tk.Button(frame, text=f'Start {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.start_timer(m))
+            start_button = tk.Button(frame, text=f'Start {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.start_timer(m))
             start_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-            pause_button = tk.Button(frame, text=f'Pause {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.pause_timer(m))
+            pause_button = tk.Button(frame, text=f'Pause {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.pause_timer(m))
             pause_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-            reset_button = tk.Button(frame, text=f'Reset {minutes} min', font=('Times New Roman', 10), command=lambda m=minutes: self.reset_timer(m))
+            reset_button = tk.Button(frame, text=f'Reset {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.reset_timer(m))
             reset_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
+        
+        # Styling for the buttons
+        style = ttk.Style()
+        style.configure("TButton", font=("Arial", 12, "bold"), padding=10)
+        style.configure("Start.TButton", background="#4CAF50", foreground="white")
+        style.configure("Pause.TButton", background="#FFC107", foreground="black")
+        style.configure("Reset.TButton", background="#F44336", foreground="white")
 
         # Break timer button and control
         break_frame = tk.Frame(self.timers_frame)
@@ -83,16 +91,16 @@ class Application:
         self.labels['break'] = tk.Label(break_frame, text=self.format_time(self.time_left['break']), font=('Times New Roman', 20))
         self.labels['break'].pack(side='left', fill='both', expand=True)
 
-        break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), command=lambda: self.start_timer('break'))
+        break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), bd=1, command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Times New Roman', 10), command=self.pause_break_timer)
+        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Times New Roman', 10), bd=1, command=self.pause_break_timer)
         self.pause_break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
         self.change_break_label = tk.Label(self.main_frame, text="Set Break Time (in minutes):", font=('Times New Roman', 10))
         self.change_break_label.pack(pady=10)
 
-        self.break_time_entry = tk.Entry(self.main_frame, font=('Times New Roman', 10))
+        self.break_time_entry = tk.Entry(self.main_frame, font=('Times New Roman', 10), bd=1)
         self.break_time_entry.pack(pady=5)
 
         self.set_break_button = tk.Button(self.main_frame, text='Set Break Time', font=('Times New Roman', 10), command=self.set_break_time)
@@ -120,7 +128,8 @@ class Application:
 
     def complete_session(self, session_name):
         # Save the session progress to Google Sheets
-        save_progress(session_name, self.original_time[session_name] // 60)  # Save the session time in minutes
+        if session_name in ['50', '40', '30', '25']:
+            save_progress(session_name, self.original_time[session_name] // 60)  # Save the session time in minutes
 
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
