@@ -9,18 +9,18 @@ import time
 # Function to log progress to Google Sheets
 def save_progress(session_name, session_time):
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-    row = [timestamp, session_time, "✅"]  # Storing Date, Time, and Check-in Emoji
+    row = [timestamp, session_time, '✅']  # Storing Date, Time, and Check-in Emoji
     worksheet.append_row(row)
 
 # Define the scope for Google Sheets
 scope = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
 ]
 
 # Authenticate using service account credentials
 creds = Credentials.from_service_account_file(
-    "C:/techWin11/pythonProjects/cronofocus/gen-lang-client-0841060528-1f4635a8f204.json",
+    'C:/techWin11/pythonProjects/cronofocus/gen-lang-client-0841060528-1f4635a8f204.json',
     scopes=scope
 )
 
@@ -31,18 +31,18 @@ client = Client(auth=creds)
 spreadsheet = client.open_by_key('1K9-zcnVTqY_Ug975Yx_bWMxftAB6_kvB_VGkiIr0xQA')  # Replace with your ID
 
 # Headers for the Google Sheets columns
-headers = ["Date", "Time", "Check-In"]
+headers = ['Date', 'Time', 'Check-In']
 worksheet = spreadsheet.sheet1
 
 class Application:
     def __init__(self, master):
         self.master = master
         self.master.title('Cronofocus')
-        self.master.geometry('500x500')
+        self.master.geometry('550x500')
         self.master.resizable(False, False)
 
         # Time left in seconds for Pomodoro sessions
-        self.time_left = {'50': 3000, '40': 2400, '30': 1800, '25': 1500, 'break': 300}  # Adjusted seconds
+        self.time_left = {'50': 5, '40': 4, '30': 3, '25': 2, 'break': 300}  # Adjusted seconds
         self.original_time = {'50': 5, '40': 4, '30': 3, '25': 2, 'break': 300}  # Store original time to reset
         self.running = {'50': False, '40': False, '30': False, '25': False, 'break': False}
 
@@ -65,50 +65,44 @@ class Application:
             frame = tk.Frame(self.timers_frame)
             frame.pack(pady=5, padx=20, fill='both', expand=True)
 
-            self.labels[minutes] = tk.Label(frame, text=self.format_time(self.time_left[minutes]), font=('Times New Roman', 20))
+            self.labels[minutes] = tk.Label(frame, text=self.format_time(self.time_left[minutes]), font=('Arial', 20))
             self.labels[minutes].pack(side='left', fill='both', expand=True)
 
-            start_button = tk.Button(frame, text=f'Start {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.start_timer(m))
+            start_button = tk.Button(frame, text=f'▶ Start {minutes} min', font=('Arial', 11), bd=1, command=lambda m=minutes: self.start_timer(m))
             start_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-            pause_button = tk.Button(frame, text=f'Pause {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.pause_timer(m))
+            pause_button = tk.Button(frame, text=f'|| Pause {minutes} min', font=('Arial', 11), bd=1, command=lambda m=minutes: self.pause_timer(m))
             pause_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-            reset_button = tk.Button(frame, text=f'Reset {minutes} min', font=('Times New Roman', 10), bd=1, command=lambda m=minutes: self.reset_timer(m))
+            reset_button = tk.Button(frame, text=f'↻ Reset {minutes} min', font=('Arial', 11), bd=1, command=lambda m=minutes: self.reset_timer(m))
             reset_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
-        
-        # Styling for the buttons
-        style = ttk.Style()
-        style.configure("TButton", font=("Arial", 12, "bold"), padding=10)
-        style.configure("Start.TButton", background="#4CAF50", foreground="white")
-        style.configure("Pause.TButton", background="#FFC107", foreground="black")
-        style.configure("Reset.TButton", background="#F44336", foreground="white")
 
         # Break timer button and control
         break_frame = tk.Frame(self.timers_frame)
         break_frame.pack(pady=5, padx=20, fill='both', expand=True)
 
-        self.labels['break'] = tk.Label(break_frame, text=self.format_time(self.time_left['break']), font=('Times New Roman', 20))
+        self.labels['break'] = tk.Label(break_frame, text=self.format_time(self.time_left['break']), font=('Arial', 20))
         self.labels['break'].pack(side='left', fill='both', expand=True)
 
-        break_button = tk.Button(break_frame, text='Start Break', font=('Times New Roman', 10), bd=1, command=lambda: self.start_timer('break'))
+        break_button = tk.Button(break_frame, text='Start Break', font=('Arial', 11), bd=1, command=lambda: self.start_timer('break'))
         break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Times New Roman', 10), bd=1, command=self.pause_break_timer)
+        self.pause_break_button = tk.Button(break_frame, text='Pause Break', font=('Arial', 11), bd=1, command=self.pause_break_timer)
         self.pause_break_button.pack(side='left', fill='x', padx=3, pady=1, expand=True)
 
-        self.change_break_label = tk.Label(self.main_frame, text="Set Break Time (in minutes):", font=('Times New Roman', 10))
+        self.change_break_label = tk.Label(self.main_frame, text='Set Break Time (in minutes):', font=('Arial', 12, 'bold'))
         self.change_break_label.pack(pady=10)
 
-        self.break_time_entry = tk.Entry(self.main_frame, font=('Times New Roman', 10), bd=1)
+        self.break_time_entry = tk.Entry(self.main_frame, font=('Arial', 11), bd=1)
         self.break_time_entry.pack(pady=5)
 
-        self.set_break_button = tk.Button(self.main_frame, text='Set Break Time', font=('Times New Roman', 10), command=self.set_break_time)
+        self.set_break_button = tk.Button(self.main_frame, text='Set Break Time', font=('Arial', 11), command=self.set_break_time)
         self.set_break_button.pack(pady=5)
 
         # Stop Sound button
-        self.stop_sound_button = tk.Button(self.main_frame, text='Stop Sound', font=('Times New Roman', 10), command=self.sound_instance.stop_sound)
+        self.stop_sound_button = tk.Button(self.main_frame, text=' ⃠   Stop Sound', font=('Arial', 11), command=self.sound_instance.stop_sound, width=15, height=2)
         self.stop_sound_button.pack(pady=5)
+
 
     def format_time(self, seconds):
         minutes = seconds // 60
@@ -157,7 +151,7 @@ class Application:
                 self.original_time['break'] = self.time_left['break']  # Update original time
                 self.labels['break'].config(text=self.format_time(self.time_left['break']))
         except ValueError:
-            print("Invalid input for break time!")
+            print('Invalid input for break time!')
 
 class Sound:
     def __init__(self):
@@ -173,7 +167,7 @@ class Sound:
 
     def _play_continuous_sound(self):
         while self.sound_playing:
-            winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+            winsound.PlaySound('SystemExclamation', winsound.SND_ALIAS)
 
 if __name__ == '__main__':
     root = tk.Tk()
