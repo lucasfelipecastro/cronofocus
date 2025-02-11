@@ -132,12 +132,30 @@ class Application:
 
     def start_timer(self, timer_name):
         if not self.running[timer_name]:
+            # If the timer was paused, it should resume from the remaining time
             self.running[timer_name] = True
             self.update_timer(timer_name)
-    
+
+            # Change the "Resume" button text back to "Pause"
+            for frame in self.timers_frame.winfo_children():
+                if isinstance(frame, tk.Frame):
+                    for widget in frame.winfo_children():
+                        if isinstance(widget, tk.Button) and widget.cget('text').startswith(f'▶ Resume {timer_name}'):
+                            widget.config(text=f"|| Pause {timer_name} min")
+
     def pause_timer(self, timer_name):
+        # Pause the timer and stop updating it
         self.running[timer_name] = False
         self.labels[timer_name].config(text=self.format_time(self.time_left[timer_name]))
+
+        # Change the "Pause" button to "Resume"
+        for frame in self.timers_frame.winfo_children():
+            if isinstance(frame, tk.Frame):
+                for widget in frame.winfo_children():
+                    if isinstance(widget, tk.Button) and widget.cget('text').startswith(f'|| Pause {timer_name}'):
+                        widget.config(text=f"▶ Resume {timer_name} min")
+
+
 
     def reset_timer(self, timer_name):
         self.running[timer_name] = False
