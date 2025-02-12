@@ -1,8 +1,10 @@
 
 # 📌 **Cronofocus**  
 ⏳ A simple, minimalist and efficient Pomodoro timer to improve your productivity!  
-![Interface do Cronofocus](assets/cronofocus)
-![Interface no Google Sheets](assets/sheet_example.jpg)
+<p align="center">
+  <img src="assets/cronofocus.jpg" alt="Cronofocus" width="52%">
+  <img src="assets/sheet_example.jpg" alt="Google Sheets Interface" width="45%">
+</p>
 
 ---
 
